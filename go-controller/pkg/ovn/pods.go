@@ -139,7 +139,6 @@ func (oc *Controller) deleteLogicalPort(pod *kapi.Pod) {
 }
 
 func (oc *Controller) addLogicalPort(pod *kapi.Pod) {
-
 	count := 30
 	logicalSwitch := pod.Spec.NodeName
 	for count > 0 {
@@ -223,4 +222,29 @@ func (oc *Controller) addLogicalPort(pod *kapi.Pod) {
 	oc.addPodToNamespaceAddressSet(pod.Namespace, addresses[1])
 
 	return
+}
+
+// AddLogicalPortWithIP add logical port with static ip address
+// and mac adddress for the pod
+func (oc *Controller) AddLogicalPortWithIP(pod *kapi.Pod) {
+	portName := fmt.Sprintf("%s_%s", pod.Namespace, pod.Name)
+	logicalSwitch := pod.Spec.NodeName
+	logrus.Debugf("Creating logical port for %s on switch %s", portName,
+		logicalSwitch)
+
+	annotation, ok := pod.Annotations["ovn"]
+	if !ok {
+		logrus.Errorf("Failed to get ovn annotation from pod!")
+		return
+	}
+	ipAddress := oc.getIPFromOvnAnnotation(annotation)
+	macAddress := oc.getMacFromOvnAnnotation(annotation)
+
+	err := exec.Command(OvnNbctl, "--may-exist", "lsp-add",
+		logicalSwitch, portName, "--", "lsp-set-addresses", portName,
+		macAddress+" "+ipAddress)
+	if err != nil {
+		logrus.Errorf("Failed to add logical port to switch: %v", err)
+		return
+	}
 }

@@ -1093,7 +1093,9 @@ func (oc *Controller) handlePeerNamespaceSelector(
 	close(channel)
 }
 
-func (oc *Controller) addNetworkPolicy(policy *kapisnetworking.NetworkPolicy) {
+// AddNetworkPolicy adds network policy and create corresponding acl rules
+func (oc *Controller) AddNetworkPolicy(
+	policy *kapisnetworking.NetworkPolicy) {
 	logrus.Infof("Adding network policy %s in namespace %s", policy.Name,
 		policy.Namespace)
 

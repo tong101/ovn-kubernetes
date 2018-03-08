@@ -203,7 +203,7 @@ func (oc *Controller) WatchNetworkPolicy() {
 	oc.watchFactory.AddPolicyHandler(cache.ResourceEventHandlerFuncs{
 		AddFunc: func(obj interface{}) {
 			policy := obj.(*kapisnetworking.NetworkPolicy)
-			oc.addNetworkPolicy(policy)
+			oc.AddNetworkPolicy(policy)
 			return
 		},
 		UpdateFunc: func(old, newer interface{}) {
@@ -211,7 +211,7 @@ func (oc *Controller) WatchNetworkPolicy() {
 			newPolicy := newer.(*kapisnetworking.NetworkPolicy)
 			if !reflect.DeepEqual(oldPolicy, newPolicy) {
 				oc.deleteNetworkPolicy(oldPolicy)
-				oc.addNetworkPolicy(newPolicy)
+				oc.AddNetworkPolicy(newPolicy)
 			}
 			return
 		},
@@ -241,7 +241,7 @@ func (oc *Controller) WatchNamespaces() {
 	oc.watchFactory.AddNamespaceHandler(cache.ResourceEventHandlerFuncs{
 		AddFunc: func(obj interface{}) {
 			ns := obj.(*kapi.Namespace)
-			oc.addNamespace(ns)
+			oc.AddNamespace(ns)
 			return
 		},
 		UpdateFunc: func(old, newer interface{}) {
